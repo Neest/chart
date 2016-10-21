@@ -1,0 +1,14 @@
+body {
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  width: 300px;
+  height: 300px;
+  margin: 100px auto;
+}
+
+.text {
+  font-family: 'Arial';
+}
