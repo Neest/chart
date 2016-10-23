@@ -1,5 +1,8 @@
 class Chart {
   constructor(args) {
+    if(args.persent > 100) args.persent = 100;
+    if(args.persent < 0) args.persent = 0;
+
     this._persent = args.persent;
     this._r = args.r;
     this._width = args.width;
@@ -47,6 +50,9 @@ class Chart {
   }
 
   persent(persent) {
+    if(persent > 100) persent = 100;
+    if(persent < 0) persent = 0;
+
     this._persent = persent;
     return this;
   }
@@ -82,6 +88,16 @@ class Chart {
     return this;
   }
 
+  fontFamily(font) {
+    this._fontFamily = font;
+    return this;
+  }
+
+  fontWeight(weight) {
+    this._fontWeight = weight;
+    return this;
+  }
+
   draw(duration) {
     this._sector = Snap(this._parent);
 
@@ -105,7 +121,9 @@ class Chart {
     .attr({
       fontSize: this._r / 2.7 + 'px',
       textAnchor: 'middle',
-      fill: this._fontColor
+      fill: this._fontColor,
+      fontFamily: this._fontFamily,
+      fontWeight: this._fontWeight
     })
     .addClass(this._fontClass);
     let textParams = t.getBBox();
@@ -138,41 +156,45 @@ class Chart {
 /****************************/
 
 let settings = {
-  parent: '#first',
   r: 100,
-  persent: 64,
-  width: 2,
-  fill: '#eee',
+  width: 15,
   strokeFilled: '#90be8c',
   strokeEmpty: '#fff',
-  fontClass: 'text',
-  // fontColor: '#72e456',
 }
 
 let a = new Chart(settings)
   .parent('#first')
-  .persent(91)
-  .draw(700);
+  .persent(70)
+  .width(11)
+  .r(110)
+  .fill('transparent')
+  .strokeEmpty('transparent')
+  .fontFamily('Poiret One')
+  .fontWeight('bold')
+  .strokeFilled('#00c8ff')
+  .draw(300);
+
 
 let b = new Chart(settings)
   .parent('#second')
-  .persent(32)
-  .strokeFilled('#581dfe')
-  .strokeEmpty('#eee')
-  .fill('#fff')
+  .persent(60)
+  .r(110)
+  .strokeFilled('#53d260')
+  .strokeEmpty('transparent')
+  .fill('#eee')
+  .fontColor('#3d3d3d')
+  .fontFamily('PT Sans')
   .draw(700);
 
 let c = new Chart(settings)
   .parent('#third')
-  .persent(47)
-  .strokeFilled('#654a31')
-  .strokeEmpty('#9d9d9d')
-  .r(95)
-  .draw(700);
-
-let d = new Chart(settings)
-  .parent('#fourth')
-  .persent(71)
-  .strokeFilled('#ed30f7')
+  .persent(43)
+  .strokeFilled('#ff6c6c')
+  .strokeEmpty('#535353')
   .fill('transparent')
+  .fontFamily('Open Sans')
+  .fontWeight('bold')
+  .fontColor('#fff')
+  .r(110)
+  .width(8)
   .draw(700);
