@@ -1,12 +1,1 @@
-body {
-  display: flex;
-  justify-content: center;
-  background: #1d1d1d;
-  flex-wrap: wrap;
-}
 
-.container {
-  width: 300px;
-  height: 300px;
-  margin: 100px auto;
-}

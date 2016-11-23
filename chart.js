@@ -50,7 +50,10 @@ window.Chart = {
     }
 
     function draw(duration) {
-      const sector = Snap(parent);
+      const sector = Snap(parent).attr({
+        height: r * 2 + width * 2,
+        width: r * 2 + width * 2
+      });
 
       let circle = sector
       .circle(r + width, r + width, r)
@@ -102,18 +105,11 @@ window.Chart = {
 
     draw(duration);
 
-  }
+  },
+
+  areaChart: function() {
+
+  },
 
 }
 
-Chart.radialChart({
-  parent: '#first',
-  persent: 70, 
-  r: 100,
-  width: 15,
-  duration: 700,
-  strokeFilled: '#00c8ff',
-  strokeEmpty: 'transparent',
-  fontFamily: 'Poiret One',
-  fontWeight: 'bold'
-});
