@@ -107,8 +107,19 @@ window.Chart = {
 
   },
 
-  areaChart: function(data, ops) {
+  plainChart: function(data, ops) {
     if(!ops) return false;
+
+    let columns = getColumnsData(),
+    colWidth = ops.width / ops.period,
+    radius = 1,
+    offsetX = 4,
+    offsetY = 0,
+    type = ops.type,
+    scale = 10;
+
+    ops.width += offsetX * 2;
+    ops.height += offsetY * 2;
 
     let paper = Snap(ops.selector).attr({
       height: ops.height,
@@ -116,35 +127,102 @@ window.Chart = {
       viewBox: `0 -${ops.height-5} ${ops.width} ${ops.height}`,
     });
 
-    let columns = getColumnsData(),
-    colWidth = ops.width / ops.period,
-    radius = offsetX = 1,
-    scale = 25;
 
-    let path = paper.path().attr({
+
+
+    buildGrid();
+
+    let chartPath = paper.path().attr({
       stroke: '#1D7988',
-      fill: '#33A6B8',
-      strokeWidth: '1px',
+      fill: '#38CCE4',
+      strokeWidth: '2px',
     });
 
-    for(let col of columns) {
-      // if(col.count)
-      //   paper.circle(offsetX, -col.count * scale, radius).attr({
-      //     fill: '#fff',
-      //   }); 
-
-      let pathString = path.attr('d');
-      let coords = `${offsetX},${-col.count * scale}`;
-      let startPos = `M ${ops.width-offsetX},0 L 0,0`;
-
-      path.attr({
-        // d: pathString ? pathString + `L ${coords}` : `M ${coords}`,
-        d: pathString ? pathString + `L ${coords}` : startPos + `L ${coords}`,
-      });
-      offsetX += colWidth;
+    switch(type) {
+      case 'area': buildAreaPath(); break;
+      case 'linear': buildLinearPath(); break;
+      case 'bar': buildBarChart(); break;
+      default: buildBarChart();
     }
 
-    path.attr({ d: path.attr('d') + 'Z' })
+    buildAxis();
+
+    function buildAxis() {
+      let axisPath = paper.path(`M0,${-ops.height} L0,0 L${ops.width},0`)
+      .attr({
+        fill: 'transparent',
+        stroke: '#aaa',
+        strokeWidth: '2px'
+      });
+    }
+
+    function buildGrid() {
+      let pathString, rows = [];
+
+      for(let i = 0; i < ops.height / scale; i++)
+        if(i % 2 == 0) rows.push(i);
+
+      for(let point of rows) {
+        let y = point * scale + offsetY;
+        pathString += ` M0,-${y} L${ops.width},-${y}`;
+      }
+
+      let gridPath = paper.path(pathString).attr({
+        fill: 'transparent',
+        stroke: '#aaa',
+        strokeWidth: '1px'
+      });
+
+    }
+
+    function buildAreaPath() {
+      for(let col of columns) {
+
+        let pathString = chartPath.attr('d'),
+            coords = `${offsetX},${-col.count * scale - offsetY}`,
+            startPos = `M ${ops.width-offsetX},0 L 0,0`;
+
+        chartPath.attr({
+          d: pathString ? pathString + `L ${coords}` : startPos + `L ${coords}`,
+        });
+        offsetX += colWidth;
+      }
+
+      chartPath.attr({ d: chartPath.attr('d') + 'Z' })
+    }
+
+    function buildLinearPath() {
+      chartPath.attr({fill: 'transparent'})
+
+      for(let col of columns) {
+        if(col.count)
+          paper.circle(offsetX, -col.count * scale - offsetY, radius).attr({
+            stroke: '#3d3d3d',
+            strokeWidth: '2px',
+            fill: 'transparent',
+          }); 
+
+        let pathString = chartPath.attr('d'),
+            coords = `${offsetX}, ${-col.count * scale - offsetY}`;
+
+        chartPath.attr({
+          d: pathString ? pathString + `L ${coords}` : `M ${coords}`,
+        });
+        offsetX += colWidth;
+      }
+    }
+
+    function buildBarChart() {
+      for(let col of columns) {
+        if(col.count) {
+          paper.rect(offsetX, -col.count * scale - offsetY, colWidth, col.count * scale)
+          .attr({
+            fill: '#4292CB',
+           });
+        }
+        offsetX += colWidth;
+      }
+    }
 
     function getColumnsData() {
       const period = ops.period || 30,
@@ -189,6 +267,10 @@ window.Chart = {
       return columns.reverse();
     }
   },
+
+  barChart: function(data, ops) {
+
+  }
 
 }
 
