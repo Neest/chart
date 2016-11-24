@@ -112,11 +112,19 @@ window.Chart = {
 
     let columns = getColumnsData(),
     colWidth = ops.width / ops.period,
-    radius = 1,
-    offsetX = 4,
+    offsetX = colWidth,
     offsetY = 0,
-    type = ops.type,
-    scale = 10;
+    type = ops.type || 'linear',
+    scale = ops.scale || 10,
+
+    lineColor = ops.line.color,
+    fillColor = ops.line.fill,
+    radius = ops.point.radius,
+    pointInnerColor = ops.point.innerColor,
+    pointOuterColor = ops.point.outerColor;
+    gridColor = ops.grid.color || '#ccc',
+    gridRows = ops.grid.rows,
+    gridCols = ops.grid.columns
 
     ops.width += offsetX * 2;
     ops.height += offsetY * 2;
@@ -127,14 +135,11 @@ window.Chart = {
       viewBox: `0 -${ops.height-5} ${ops.width} ${ops.height}`,
     });
 
-
-
-
     buildGrid();
 
     let chartPath = paper.path().attr({
-      stroke: '#1D7988',
-      fill: '#38CCE4',
+      stroke: lineColor,
+      fill: fillColor,
       strokeWidth: '2px',
     });
 
@@ -145,7 +150,7 @@ window.Chart = {
       default: buildBarChart();
     }
 
-    buildAxis();
+    if(ops.axis) buildAxis();
 
     function buildAxis() {
       let axisPath = paper.path(`M0,${-ops.height} L0,0 L${ops.width},0`)
@@ -157,21 +162,42 @@ window.Chart = {
     }
 
     function buildGrid() {
-      let pathString, rows = [];
+      let rowsPathString = colsPathString = '',
+          rows = [], _offsetX = offsetX;
 
-      for(let i = 0; i < ops.height / scale; i++)
-        if(i % 2 == 0) rows.push(i);
+      const gridStyle = {
+        fill: 'transparent',
+        stroke: '#ccc',
+        strokeWidth: '.5px'
+      };
 
-      for(let point of rows) {
-        let y = point * scale + offsetY;
-        pathString += ` M0,-${y} L${ops.width},-${y}`;
+      if(gridRows) {
+        for(let i = 0; i < ops.height / scale; i++)
+          if(i % 2 == 0) rows.push(i);
+
+        for(let point of rows) {
+          let y = point * scale + offsetY;
+          rowsPathString += ` M0,-${y} L${ops.width},-${y}`;
+        }
+
+        let rowsPath = paper.path(rowsPathString).attr(gridStyle);
       }
 
-      let gridPath = paper.path(pathString).attr({
-        fill: 'transparent',
-        stroke: '#aaa',
-        strokeWidth: '1px'
-      });
+
+      if(gridCols) {
+
+        for(let i = 0; i < ops.width / colWidth; i++) {
+          if(i % 2 == 0) {
+            colsPathString += `M${_offsetX},0 L${_offsetX},-${ops.height}`;
+          }
+          _offsetX += colWidth;
+        }
+
+        let colsPath = paper.path(colsPathString).attr(gridStyle)
+      }
+
+
+
 
     }
 
@@ -197,9 +223,8 @@ window.Chart = {
       for(let col of columns) {
         if(col.count)
           paper.circle(offsetX, -col.count * scale - offsetY, radius).attr({
-            stroke: '#3d3d3d',
-            strokeWidth: '2px',
-            fill: 'transparent',
+            stroke: pointOuterColor,
+            fill: pointInnerColor,
           }); 
 
         let pathString = chartPath.attr('d'),
@@ -217,7 +242,8 @@ window.Chart = {
         if(col.count) {
           paper.rect(offsetX, -col.count * scale - offsetY, colWidth, col.count * scale)
           .attr({
-            fill: '#4292CB',
+            fill: fillColor,
+            stroke: lineColor
            });
         }
         offsetX += colWidth;
