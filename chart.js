@@ -113,12 +113,14 @@ window.Chart = {
     let columns = getColumnsData(),
     colWidth = ops.width / ops.period,
     offsetX = colWidth,
-    offsetY = 0,
+    offsetY = 5,
     type = ops.type || 'linear',
     scale = ops.scale || 10,
 
     lineColor = ops.line.color,
     fillColor = ops.line.fill,
+    fillOpacity = ops.line.opacity,
+    hoverColor = ops.line.hoverColor,
     radius = ops.point.radius,
     pointInnerColor = ops.point.innerColor,
     pointOuterColor = ops.point.outerColor;
@@ -135,12 +137,15 @@ window.Chart = {
       viewBox: `0 -${ops.height-5} ${ops.width} ${ops.height}`,
     });
 
-    buildGrid();
+    if(gridCols || gridRows) buildGrid();
 
     let chartPath = paper.path().attr({
       stroke: lineColor,
-      fill: fillColor,
+      fill: '#fff',
       strokeWidth: '2px',
+      strokeDasharray: 2000,
+      strokeDashoffset: 2000,
+      strokeLinejoin: 'round',
     });
 
     switch(type) {
@@ -174,31 +179,22 @@ window.Chart = {
       if(gridRows) {
         for(let i = 0; i < ops.height / scale; i++)
           if(i % 2 == 0) rows.push(i);
-
         for(let point of rows) {
           let y = point * scale + offsetY;
           rowsPathString += ` M0,-${y} L${ops.width},-${y}`;
         }
-
         let rowsPath = paper.path(rowsPathString).attr(gridStyle);
       }
 
-
       if(gridCols) {
-
         for(let i = 0; i < ops.width / colWidth; i++) {
           if(i % 2 == 0) {
             colsPathString += `M${_offsetX},0 L${_offsetX},-${ops.height}`;
           }
           _offsetX += colWidth;
         }
-
         let colsPath = paper.path(colsPathString).attr(gridStyle)
       }
-
-
-
-
     }
 
     function buildAreaPath() {
@@ -206,7 +202,7 @@ window.Chart = {
 
         let pathString = chartPath.attr('d'),
             coords = `${offsetX},${-col.count * scale - offsetY}`,
-            startPos = `M ${ops.width-offsetX},0 L 0,0`;
+            startPos = `M${ops.width-offsetX},-${offsetY} L${offsetY},-${offsetY}`;
 
         chartPath.attr({
           d: pathString ? pathString + `L ${coords}` : startPos + `L ${coords}`,
@@ -215,17 +211,37 @@ window.Chart = {
       }
 
       chartPath.attr({ d: chartPath.attr('d') + 'Z' })
+      chartPath.animate({
+        strokeDashoffset: 0,
+      }, 1000, function() {
+        chartPath.animate({fill: fillColor, fillOpacity: fillOpacity}, 1000);
+      });
     }
 
     function buildLinearPath() {
       chartPath.attr({fill: 'transparent'})
 
+      let timeout = 0;
+
       for(let col of columns) {
-        if(col.count)
-          paper.circle(offsetX, -col.count * scale - offsetY, radius).attr({
-            stroke: pointOuterColor,
-            fill: pointInnerColor,
-          }); 
+        let point = paper.circle(offsetX, -col.count * scale - offsetY, 0).attr({
+          stroke: pointOuterColor,
+          fill: pointInnerColor,
+          id: 'point',
+        });
+
+        setTimeout(function() {
+          point.animate({r: radius}, 200, mina.easein);
+        }, timeout);
+        timeout += 30;
+
+        let timer;
+        point.hover(function() {
+          this.stop().animate({r: radius * 2}, 1000, mina.elastic);
+        }, function() {
+          clearTimeout(timer);
+          this.stop().animate({r: radius}, 1000, mina.elastic);
+        });
 
         let pathString = chartPath.attr('d'),
             coords = `${offsetX}, ${-col.count * scale - offsetY}`;
@@ -235,17 +251,41 @@ window.Chart = {
         });
         offsetX += colWidth;
       }
+
+      chartPath.animate({
+        strokeDashoffset: 0
+      }, 2500); 
     }
 
     function buildBarChart() {
+      let timeout = 0;
+
       for(let col of columns) {
         if(col.count) {
-          paper.rect(offsetX, -col.count * scale - offsetY, colWidth, col.count * scale)
+          let bar = paper.rect(offsetX, 0 , colWidth, colWidth * scale * 2)
           .attr({
             fill: fillColor,
             stroke: lineColor
            });
+
+          setTimeout(() => {
+            bar.animate({
+              y: -col.count * scale - offsetY,
+            }, 1500, mina.elastic);
+          }, timeout);
+
+          bar.hover(function() {
+            this.stop().animate({
+              fill: hoverColor,
+            }, 200, mina.easeinout);
+          }, function() {
+            this.stop().animate({
+              fill: fillColor
+            }, 200, mina.easeinout);
+          });
+
         }
+        timeout += 20;
         offsetX += colWidth;
       }
     }
@@ -293,10 +333,6 @@ window.Chart = {
       return columns.reverse();
     }
   },
-
-  barChart: function(data, ops) {
-
-  }
 
 }
 

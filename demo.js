@@ -2,13 +2,16 @@
 * TEST DATA
 *********************************/
 let data = [
-  {date: new Date(2016, 10, 24), task: 'Some task'},
-  {date: new Date(2016, 10, 24), task: 'Some task'},
-  {date: new Date(2016, 10, 24), task: 'Some task'},
-  {date: new Date(2016, 10, 23), task: 'Some task'},
-  {date: new Date(2016, 10, 22), task: 'Some task'},
-  {date: new Date(2016, 10, 22), task: 'Some task'},
-  {date: new Date(2016, 10, 22), task: 'Some task'},
+  {date: new Date(2016, 10, 25), task: 'Some task1'},
+  {date: new Date(2016, 10, 24), task: 'Some task1'},
+  {date: new Date(2016, 10, 24), task: 'Some task1'},
+  {date: new Date(2016, 10, 24), task: 'Some task1'},
+  {date: new Date(2016, 10, 24), task: 'Some task2'},
+  {date: new Date(2016, 10, 23), task: 'Some task3'},
+  {date: new Date(2016, 10, 23), task: 'Some task4'},
+  {date: new Date(2016, 10, 22), task: 'Some task5'},
+  {date: new Date(2016, 10, 22), task: 'Some task6'},
+  {date: new Date(2016, 10, 22), task: 'Some task7'},
   {date: new Date(2016, 10, 22), task: 'Some task'},
   {date: new Date(2016, 10, 21), task: 'Some task'},
   {date: new Date(2016, 10, 21), task: 'Some task'},
@@ -141,7 +144,6 @@ let data = [
   {date: new Date(2016, 9, 30), task: 'Some task'},
   {date: new Date(2016, 9, 30), task: 'Some task'},
   {date: new Date(2016, 9, 30), task: 'Some task'},
-  {date: new Date(2016, 9, 28), task: 'Some task'},
   {date: new Date(2016, 9, 29), task: 'Some task'},
   {date: new Date(2016, 9, 29), task: 'Some task'},
   {date: new Date(2016, 9, 29), task: 'Some task'},
@@ -149,12 +151,10 @@ let data = [
   {date: new Date(2016, 9, 29), task: 'Some task'},
   {date: new Date(2016, 9, 29), task: 'Some task'},
   {date: new Date(2016, 9, 29), task: 'Some task'},
-  {date: new Date(2016, 9, 28), task: 'Some task'},
   {date: new Date(2016, 9, 27), task: 'Some task'},
   {date: new Date(2016, 9, 27), task: 'Some task'},
   {date: new Date(2016, 9, 27), task: 'Some task'},
   {date: new Date(2016, 9, 27), task: 'Some task'},
-  {date: new Date(2016, 9, 26), task: 'Some task'},
   {date: new Date(2016, 9, 26), task: 'Some task'},
   {date: new Date(2016, 9, 26), task: 'Some task'},
 ];
@@ -164,25 +164,27 @@ let data = [
 *********************************/
 Chart.plainChart(data, {
   selector: '#paper',
-  type: 'linear', 
+  type: 'area', 
   height: 150,
-  width: 500,
+  width: 600,
   period: 30,
   scale: 10,
   axis: false,
   line: {
-    color: '#982D2D',
-    fill: '#c24242',
+    color: '#338BF7',
+    fill: '#0066FF',
+    opacity: '0.5',
+    hoverColor: '#CC8C4C',
   },
   point: {
-    radius: 3,
-    innerColor: '#FF8C26',
+    radius: 4,
+    innerColor: '#129F06',
     outerColor: '#0F6320',
   },
   grid: {
     rows: true,
     columns: true,
     color: '#ccc'
-  }
+  },
 });
 

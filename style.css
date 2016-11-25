@@ -7,3 +7,12 @@ body {
   align-items: center;
 }
 
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+#point {
+  cursor: pointer;
+}
