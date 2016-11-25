@@ -164,27 +164,29 @@ let data = [
 *********************************/
 Chart.plainChart(data, {
   selector: '#paper',
-  type: 'area', 
+  type: 'linear', 
   height: 150,
-  width: 600,
+  width: 400,
   period: 30,
   scale: 10,
   axis: false,
   line: {
-    color: '#338BF7',
-    fill: '#0066FF',
+    color: '#5D8ED8',
+    fill: '#8EB0E4',
     opacity: '0.5',
     hoverColor: '#CC8C4C',
+    width: 3
   },
   point: {
-    radius: 4,
-    innerColor: '#129F06',
-    outerColor: '#0F6320',
+    radius: 5,
+    innerColor: '#338BF7',
+    outerColor: '#fff',
+    strokeWidth: 2,
   },
   grid: {
     rows: true,
     columns: true,
-    color: '#ccc'
+    color: '#aaa'
   },
 });
 

@@ -108,25 +108,14 @@ window.Chart = {
   },
 
   plainChart: function(data, ops) {
-    if(!ops) return false;
+    if(!data || !ops) return false;
 
-    let columns = getColumnsData(),
+    let columns = getColumnsData(data, ops.period),
     colWidth = ops.width / ops.period,
     offsetX = colWidth,
     offsetY = 5,
     type = ops.type || 'linear',
-    scale = ops.scale || 10,
-
-    lineColor = ops.line.color,
-    fillColor = ops.line.fill,
-    fillOpacity = ops.line.opacity,
-    hoverColor = ops.line.hoverColor,
-    radius = ops.point.radius,
-    pointInnerColor = ops.point.innerColor,
-    pointOuterColor = ops.point.outerColor;
-    gridColor = ops.grid.color || '#ccc',
-    gridRows = ops.grid.rows,
-    gridCols = ops.grid.columns
+    scale = ops.scale || 10;
 
     ops.width += offsetX * 2;
     ops.height += offsetY * 2;
@@ -137,28 +126,35 @@ window.Chart = {
       viewBox: `0 -${ops.height-5} ${ops.width} ${ops.height}`,
     });
 
-    if(gridCols || gridRows) buildGrid();
+    if(ops.grid.columns || ops.grid.rows)
+      buildGrid(paper, offsetX, offsetY, scale, ops.width, ops.height, colWidth, ops.grid);
 
-    let chartPath = paper.path().attr({
-      stroke: lineColor,
-      fill: '#fff',
-      strokeWidth: '2px',
-      strokeDasharray: 2000,
-      strokeDashoffset: 2000,
-      strokeLinejoin: 'round',
-    });
+    let chartStyle = {
+      opacity: ops.line.opacity,
+      color: ops.line.color,
+      fill: ops.line.fill,
+      width: ops.line.width,
+      hover: ops.line.hoverColor,
+      point: {
+        r: ops.point.radius,
+        fill: ops.point.innerColor,
+        stroke: ops.point.outerColor,
+        strokeWidth: ops.point.strokeWidth
+      }
+    };
 
     switch(type) {
-      case 'area': buildAreaPath(); break;
-      case 'linear': buildLinearPath(); break;
-      case 'bar': buildBarChart(); break;
-      default: buildBarChart();
+      case 'area': buildAreaPath(paper, columns, offsetX, offsetY, scale, colWidth, chartStyle); break;
+      case 'linear': buildLinearPath(paper, columns, offsetX, offsetY, scale, colWidth, chartStyle); break;
+      case 'bar': buildBarChart(paper, columns, offsetX, offsetY, scale, colWidth, chartStyle); break;
+      default: buildBarChart(paper, columns, offsetX, offsetY, scale, colWidth, chartStyle);
     }
 
-    if(ops.axis) buildAxis();
+    if(ops.axis)
+      buildAxis(paper);
 
-    function buildAxis() {
-      let axisPath = paper.path(`M0,${-ops.height} L0,0 L${ops.width},0`)
+    function buildAxis(_paper) {
+      _paper.path(`M0,${-ops.height} L0,0 L${ops.width},0`)
       .attr({
         fill: 'transparent',
         stroke: '#aaa',
@@ -166,149 +162,168 @@ window.Chart = {
       });
     }
 
-    function buildGrid() {
+    function buildGrid(_paper, _offsetX, _offsetY, _scale, _width, _height, _colWidth, gridOps) {
       let rowsPathString = colsPathString = '',
-          rows = [], _offsetX = offsetX;
+          rows = [];
 
       const gridStyle = {
         fill: 'transparent',
-        stroke: '#ccc',
+        stroke: gridOps.color || '#aaa',
         strokeWidth: '.5px'
       };
 
-      if(gridRows) {
-        for(let i = 0; i < ops.height / scale; i++)
+      if(gridOps.rows) {
+        for(let i = 0; i < _height / _scale; i++)
           if(i % 2 == 0) rows.push(i);
         for(let point of rows) {
-          let y = point * scale + offsetY;
+          let y = point * _scale + _offsetY;
           rowsPathString += ` M0,-${y} L${ops.width},-${y}`;
         }
-        let rowsPath = paper.path(rowsPathString).attr(gridStyle);
+        _paper.path(rowsPathString).attr(gridStyle);
       }
 
-      if(gridCols) {
-        for(let i = 0; i < ops.width / colWidth; i++) {
+      if(gridOps.columns) {
+        for(let i = 0; i < _width / _colWidth; i++) {
           if(i % 2 == 0) {
-            colsPathString += `M${_offsetX},0 L${_offsetX},-${ops.height}`;
+            colsPathString += `M${_offsetX},0 L${_offsetX},-${_height}`;
           }
-          _offsetX += colWidth;
+          _offsetX += _colWidth;
         }
-        let colsPath = paper.path(colsPathString).attr(gridStyle)
+        _paper.path(colsPathString).attr(gridStyle)
       }
     }
 
-    function buildAreaPath() {
-      for(let col of columns) {
+    function buildAreaPath(_paper, _columns, _offsetX, _offsetY, _scale, _colWidth, style) {
+
+      let chartPath = _paper.path().attr({
+        stroke: style.color,
+        fill: '#fff',
+        fillOpacity: style.opacity,
+        strokeWidth: style.width,
+        strokeDasharray: 5000,
+        strokeDashoffset: 5000,
+        strokeLinejoin: 'round',
+      });
+
+      for(let col of _columns) {
 
         let pathString = chartPath.attr('d'),
-            coords = `${offsetX},${-col.count * scale - offsetY}`,
-            startPos = `M${ops.width-offsetX},-${offsetY} L${offsetY},-${offsetY}`;
+        coords = `${_offsetX},${-col.count * _scale - _offsetY}`,
+        startPos = `M${ops.width-_offsetX},-${_offsetY} L${_offsetY},-${_offsetY}`;
 
         chartPath.attr({
           d: pathString ? pathString + `L ${coords}` : startPos + `L ${coords}`,
         });
-        offsetX += colWidth;
+        _offsetX += _colWidth;
       }
 
       chartPath.attr({ d: chartPath.attr('d') + 'Z' })
       chartPath.animate({
         strokeDashoffset: 0,
-      }, 1000, function() {
-        chartPath.animate({fill: fillColor, fillOpacity: fillOpacity}, 1000);
-      });
+      }, 3000);
+
+      setTimeout(function() {
+        chartPath.animate({fill: fillColor, fillOpacity: fillOpacity}, 300);
+      }, 1500)
     }
 
-    function buildLinearPath() {
-      chartPath.attr({fill: 'transparent'})
+    function buildLinearPath(_paper, _columns, _offsetX, _offsetY, _scale, _colWidth, style) {
+
+      let chartPath = paper.path().attr({
+        stroke: style.color,
+        fill: 'transparent',
+        fillOpacity: style.opacity,
+        strokeWidth: style.width,
+        strokeDasharray: 5000,
+        strokeDashoffset: 5000,
+        strokeLinejoin: 'round',
+      });
 
       let timeout = 0;
 
-      for(let col of columns) {
-        let point = paper.circle(offsetX, -col.count * scale - offsetY, 0).attr({
-          stroke: pointOuterColor,
-          fill: pointInnerColor,
+      for(let col of _columns) {
+        let point = _paper.circle(_offsetX, -col.count * _scale - _offsetY, 0).attr({
+          strokeWidth: style.point.strokeWidth,
+          stroke: style.point.stroke,
+          fill: style.point.fill,
           id: 'point',
         });
 
         setTimeout(function() {
-          point.animate({r: radius}, 200, mina.easein);
+          point.animate({r: style.point.r}, 200, mina.easein);
         }, timeout);
         timeout += 30;
 
         let timer;
         point.hover(function() {
-          this.stop().animate({r: radius * 2}, 1000, mina.elastic);
+          this.stop().animate({r: style.point.r * 2}, 1000, mina.elastic);
         }, function() {
           clearTimeout(timer);
-          this.stop().animate({r: radius}, 1000, mina.elastic);
+          this.stop().animate({r: style.point.r}, 1000, mina.elastic);
         });
 
         let pathString = chartPath.attr('d'),
-            coords = `${offsetX}, ${-col.count * scale - offsetY}`;
+            coords = `${_offsetX}, ${-col.count * _scale - _offsetY}`;
 
         chartPath.attr({
           d: pathString ? pathString + `L ${coords}` : `M ${coords}`,
         });
-        offsetX += colWidth;
+        _offsetX += _colWidth;
       }
 
       chartPath.animate({
         strokeDashoffset: 0
-      }, 2500); 
+      }, 4000); 
     }
 
-    function buildBarChart() {
+    function buildBarChart(_paper, _columns, _offsetX, _offsetY, _scale, _colWidth, style) {
       let timeout = 0;
 
-      for(let col of columns) {
+      for(let col of _columns) {
         if(col.count) {
-          let bar = paper.rect(offsetX, 0 , colWidth, colWidth * scale * 2)
+          let bar = _paper.rect(_offsetX, 0 , _colWidth, _colWidth * _scale * 2)
           .attr({
-            fill: fillColor,
-            stroke: lineColor
+            fill: style.fill,
+            stroke: style.color 
            });
 
           setTimeout(() => {
             bar.animate({
-              y: -col.count * scale - offsetY,
+              y: -col.count * _scale - offsetY,
             }, 1500, mina.elastic);
           }, timeout);
 
           bar.hover(function() {
-            this.stop().animate({
-              fill: hoverColor,
-            }, 200, mina.easeinout);
+            this.stop().animate({fill: style.hover}, 200, mina.easeinout);
           }, function() {
-            this.stop().animate({
-              fill: fillColor
-            }, 200, mina.easeinout);
+            this.stop().animate({fill: style.fill}, 200, mina.easeinout);
           });
 
         }
         timeout += 20;
-        offsetX += colWidth;
+        _offsetX += _colWidth;
       }
     }
 
-    function getColumnsData() {
-      const period = ops.period || 30,
-        daysInMonth = function(year, month) {
-          return 32 - new Date(year, month, 32).getDate();
-        };
+    function getColumnsData(tasks, period) {
+      period = period || 30,
+
+      daysInMonth = function(year, month) {
+        return 32 - new Date(year, month, 32).getDate();
+      };
 
       let curDate = new Date(),
-        columns = [],
-        curDay = curDate.getDate(),
-        curMonth = curDate.getMonth(),
-        curYear = curDate.getFullYear();
+      columns = [],
+      curDay = curDate.getDate(),
+      curMonth = curDate.getMonth(),
+      curYear = curDate.getFullYear();
 
       /*************************************************
       * CREATE LIST OF CHART COLUMNS
       *************************************************/
       for(let i = 0; i < period; i++) {
-        if(curDay == 0){
+        if(curDay == 0)
           curDay = daysInMonth(curYear, --curMonth);
-        }
 
         columns.push({
           date: new Date(curYear, curMonth, curDay--).getTime(),
@@ -320,7 +335,7 @@ window.Chart = {
       /*************************************************
       * CREATE CHART POINTS
       *************************************************/
-      for(let task of data) {
+      for(let task of tasks) {
         let taskTime = task.date.setHours(0,0,0,0);
 
         for(let col of columns)
