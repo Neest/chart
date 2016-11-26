@@ -107,54 +107,65 @@ window.Chart = {
 
   },
 
-  plainChart: function(data, ops) {
-    if(!data || !ops) return false;
+  plainChart: function(settings, charts) {
+    if(!settings || !charts) return false;
 
-    let columns = getColumnsData(data, ops.period),
-    colWidth = ops.width / ops.period,
+    let colWidth = settings.width / settings.period,
     offsetX = colWidth,
     offsetY = 5,
-    type = ops.type || 'linear',
-    scale = ops.scale || 10;
+    scale = settings.scale || 10;
 
-    ops.width += offsetX * 2;
-    ops.height += offsetY * 2;
+    settings.width += offsetX * 2;
+    settings.height += offsetY * 2;
 
-    let paper = Snap(ops.selector).attr({
-      height: ops.height,
-      width: ops.width,
-      viewBox: `0 -${ops.height-5} ${ops.width} ${ops.height}`,
+    const paper = Snap(settings.selector).attr({
+      height: settings.height,
+      width: settings.width,
+      viewBox: `0 -${settings.height-5} ${settings.width} ${settings.height}`,
     });
 
-    if(ops.grid.columns || ops.grid.rows)
-      buildGrid(paper, offsetX, offsetY, scale, ops.width, ops.height, colWidth, ops.grid);
 
-    let chartStyle = {
-      opacity: ops.line.opacity,
-      color: ops.line.color,
-      fill: ops.line.fill,
-      width: ops.line.width,
-      hover: ops.line.hoverColor,
-      point: {
-        r: ops.point.radius,
-        fill: ops.point.innerColor,
-        stroke: ops.point.outerColor,
-        strokeWidth: ops.point.strokeWidth
-      }
-    };
-
-    switch(type) {
-      case 'area': buildAreaPath(paper, columns, offsetX, offsetY, scale, colWidth, chartStyle); break;
-      case 'linear': buildLinearPath(paper, columns, offsetX, offsetY, scale, colWidth, chartStyle); break;
-      case 'bar': buildBarChart(paper, columns, offsetX, offsetY, scale, colWidth, chartStyle); break;
-      default: buildBarChart(paper, columns, offsetX, offsetY, scale, colWidth, chartStyle);
+    if(settings.grid.rows || settings.grid.columns) {
+      buildGrid(paper, offsetX, offsetY, scale, settings.width, settings.height, colWidth, settings.grid);
     }
 
-    if(ops.axis)
-      buildAxis(paper);
+    for(let chartData of charts) {
 
-    function buildAxis(_paper) {
-      _paper.path(`M0,${-ops.height} L0,0 L${ops.width},0`)
+      let columns = getColumns(chartData.data, chartData.period),
+      type = chartData.type || 'linear';
+
+      let chartStyle = {
+        opacity: chartData.line.opacity,
+        color: chartData.line.color,
+        fill: chartData.line.fill,
+        width: chartData.line.width,
+        hover: chartData.line.hovercolor,
+        point: {
+          r: chartData.point.radius,
+          fill: chartData.point.innerColor,
+          stroke: chartData.point.outerColor,
+          strokeWidth: chartData.point.strokeWidth
+        }
+      };
+
+      switch(type) {
+        case 'area': buildAreaPath(paper, columns, offsetX, offsetY, scale, settings.width, colWidth, chartStyle); break;
+        case 'linear': buildLinearPath(paper, columns, offsetX, offsetY, scale, colWidth, chartStyle); break;
+        case 'bar': buildBarChart(paper, columns, offsetX, offsetY, scale, colWidth, chartStyle); break;
+        default: buildBarChart(paper, columns, offsetX, offsetY, scale, colWidth, chartStyle);
+      }
+
+    } // for
+
+    if(settings.axis)
+      buildAxis(paper, settings.height, settings.width, offsetY);
+
+    /*****************************************************
+    *  FUNCTIONS
+    *****************************************************/
+
+    function buildAxis(_paper, _height, _width, _offsetY) {
+      _paper.path(`M0,${-_height} L0,${_offsetY} L${_width},${_offsetY}`)
       .attr({
         fill: 'transparent',
         stroke: '#aaa',
@@ -177,7 +188,7 @@ window.Chart = {
           if(i % 2 == 0) rows.push(i);
         for(let point of rows) {
           let y = point * _scale + _offsetY;
-          rowsPathString += ` M0,-${y} L${ops.width},-${y}`;
+          rowsPathString += ` M0,-${y} L${_width},-${y}`;
         }
         _paper.path(rowsPathString).attr(gridStyle);
       }
@@ -193,7 +204,7 @@ window.Chart = {
       }
     }
 
-    function buildAreaPath(_paper, _columns, _offsetX, _offsetY, _scale, _colWidth, style) {
+    function buildAreaPath(_paper, _columns, _offsetX, _offsetY, _scale, _width, _colWidth, style) {
 
       let chartPath = _paper.path().attr({
         stroke: style.color,
@@ -209,7 +220,7 @@ window.Chart = {
 
         let pathString = chartPath.attr('d'),
         coords = `${_offsetX},${-col.count * _scale - _offsetY}`,
-        startPos = `M${ops.width-_offsetX},-${_offsetY} L${_offsetY},-${_offsetY}`;
+        startPos = `M${_width-_offsetX},-${_offsetY} L${_offsetY},-${_offsetY}`;
 
         chartPath.attr({
           d: pathString ? pathString + `L ${coords}` : startPos + `L ${coords}`,
@@ -223,7 +234,7 @@ window.Chart = {
       }, 3000);
 
       setTimeout(function() {
-        chartPath.animate({fill: fillColor, fillOpacity: fillOpacity}, 300);
+        chartPath.animate({fill: style.fill, fillOpacity: style.opacity}, 300);
       }, 1500)
     }
 
@@ -305,7 +316,7 @@ window.Chart = {
       }
     }
 
-    function getColumnsData(tasks, period) {
+    function getColumns(tasks, period) {
       period = period || 30,
 
       daysInMonth = function(year, month) {
