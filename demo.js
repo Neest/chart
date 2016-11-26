@@ -2,6 +2,7 @@
 * TEST DATA
 *********************************/
 let data = [
+  {date: new Date(2016, 10, 26), task: 'some task1'},
   {date: new Date(2016, 10, 25), task: 'some task1'},
   {date: new Date(2016, 10, 24), task: 'some task1'},
   {date: new Date(2016, 10, 24), task: 'some task1'},
@@ -240,7 +241,7 @@ let data2 = [
 Chart.plainChart({
   selector: '#paper',
   height: 150,
-  width: 400,
+  width: 450,
   period: 30,
   scale: 10,
   axis: false,
@@ -251,22 +252,32 @@ Chart.plainChart({
   }
 }, [
   {
+    data: data2,
+    type: 'area',
+    line: {
+      color: '#9E9E9E',
+      fill: '#eee',
+      opacity: '0.3',
+      hoverColor: '#CC8C4C',
+      width: 1
+    },
+  },
+  {
     data: data,
     type: 'linear',
     line: {
-      color: '#5D8ED8',
-      fill: '#8EB0E4',
+      color: '#fff',
       opacity: '0.5',
       hoverColor: '#CC8C4C',
       width: 3
     },
     point: {
-      radius: 5,
-      innerColor: '#338BF7',
-      outerColor: '#fff',
-      strokeWidth: 2,
+      radius: 4,
+      innerColor: '#fff',
+      outerColor: '#3d3d3d',
+      strokeWidth: 1
     },
-  }
+  },
 ]);
 
 

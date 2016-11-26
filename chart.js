@@ -121,7 +121,7 @@ window.Chart = {
     const paper = Snap(settings.selector).attr({
       height: settings.height,
       width: settings.width,
-      viewBox: `0 -${settings.height-5} ${settings.width} ${settings.height}`,
+      viewBox: `-20 -${settings.height-5} ${settings.width} ${settings.height}`,
     });
 
 
@@ -134,17 +134,22 @@ window.Chart = {
       let columns = getColumns(chartData.data, chartData.period),
       type = chartData.type || 'linear';
 
+      let defaultColor = '#aaa';
+
+      chartData.point = chartData.point || {};
+      chartData.line = chartData.line || {};
+
       let chartStyle = {
-        opacity: chartData.line.opacity,
-        color: chartData.line.color,
-        fill: chartData.line.fill,
-        width: chartData.line.width,
-        hover: chartData.line.hovercolor,
+        opacity: chartData.line.opacity || 0.5,
+        color: chartData.line.color || defaultColor,
+        fill: chartData.line.fill || defaultColor,
+        width: chartData.line.width || 2,
+        hover: chartData.line.hovercolor || defaultColor,
         point: {
-          r: chartData.point.radius,
-          fill: chartData.point.innerColor,
-          stroke: chartData.point.outerColor,
-          strokeWidth: chartData.point.strokeWidth
+          r: chartData.point.radius || 4,
+          fill: chartData.point.innerColor || defaultColor,
+          stroke: chartData.point.outerColor || defaultColor,
+          strokeWidth: chartData.point.strokeWidth || 3
         }
       };
 
@@ -183,11 +188,21 @@ window.Chart = {
         strokeWidth: '.5px'
       };
 
+      let textStyle = {
+        fontFamily: 'PT Sans',
+        fontWeight: 'bold',
+        fontSize: '.8em',
+        textAnchor: 'middle',
+        fill: '#aaa'
+      };
+
       if(gridOps.rows) {
         for(let i = 0; i < _height / _scale; i++)
           if(i % 2 == 0) rows.push(i);
         for(let point of rows) {
           let y = point * _scale + _offsetY;
+          _paper.text(-offsetX, -y+_offsetY, `${point}`)
+            .attr(textStyle);
           rowsPathString += ` M0,-${y} L${_width},-${y}`;
         }
         _paper.path(rowsPathString).attr(gridStyle);
@@ -245,15 +260,21 @@ window.Chart = {
         fill: 'transparent',
         fillOpacity: style.opacity,
         strokeWidth: style.width,
-        strokeDasharray: 5000,
-        strokeDashoffset: 5000,
+        strokeDasharray: 3000,
+        strokeDashoffset: 3000,
         strokeLinejoin: 'round',
       });
 
       let timeout = 0;
 
       for(let col of _columns) {
-        let point = _paper.circle(_offsetX, -col.count * _scale - _offsetY, 0).attr({
+
+        let pointCoords = {
+          x: _offsetX,
+          y: -col.count * _scale - _offsetY
+        };
+
+        let point = _paper.circle(pointCoords.x, pointCoords.y, 0).attr({
           strokeWidth: style.point.strokeWidth,
           stroke: style.point.stroke,
           fill: style.point.fill,
@@ -284,7 +305,7 @@ window.Chart = {
 
       chartPath.animate({
         strokeDashoffset: 0
-      }, 4000); 
+      }, 3000); 
     }
 
     function buildBarChart(_paper, _columns, _offsetX, _offsetY, _scale, _colWidth, style) {
@@ -342,6 +363,7 @@ window.Chart = {
           tasks: [],
         });
       }
+
 
       /*************************************************
       * CREATE CHART POINTS
