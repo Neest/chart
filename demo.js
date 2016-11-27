@@ -2,6 +2,7 @@
 * TEST DATA
 *********************************/
 let data = [
+  {date: new Date(2016, 10, 27), task: 'some task1'},
   {date: new Date(2016, 10, 26), task: 'some task1'},
   {date: new Date(2016, 10, 25), task: 'some task1'},
   {date: new Date(2016, 10, 24), task: 'some task1'},
@@ -152,6 +153,9 @@ let data = [
   {date: new Date(2016, 9, 29), task: 'some task'},
   {date: new Date(2016, 9, 29), task: 'some task'},
   {date: new Date(2016, 9, 29), task: 'some task'},
+  {date: new Date(2016, 9, 29), task: 'some task'},
+  {date: new Date(2016, 9, 28), task: 'some task'},
+  {date: new Date(2016, 9, 28), task: 'some task'},
   {date: new Date(2016, 9, 27), task: 'some task'},
   {date: new Date(2016, 9, 27), task: 'some task'},
   {date: new Date(2016, 9, 27), task: 'some task'},
@@ -228,6 +232,9 @@ let data2 = [
   {date: new Date(2016, 9, 30), task: 'some task'},
   {date: new Date(2016, 9, 30), task: 'some task'},
   {date: new Date(2016, 9, 29), task: 'some task'},
+  {date: new Date(2016, 9, 28), task: 'some task'},
+  {date: new Date(2016, 9, 28), task: 'some task'},
+  {date: new Date(2016, 9, 28), task: 'some task'},
   {date: new Date(2016, 9, 29), task: 'some task'},
   {date: new Date(2016, 9, 29), task: 'some task'},
   {date: new Date(2016, 9, 29), task: 'some task'},
@@ -242,7 +249,7 @@ let data2 = [
 Chart.plainChart({
   selector: '#paper',
   height: 150,
-  width: 450,
+  width: 550,
   period: 30,
   scale: 10,
   axis: false,
@@ -250,7 +257,7 @@ Chart.plainChart({
   grid: {
     rows: true,
     columns: true,
-    color: '#aaa',
+    color: '#6D6C6C',
     text: {
       color: '#fff',
       fontFamily: 'PT Sans',
@@ -263,12 +270,11 @@ Chart.plainChart({
     data: data2,
     type: 'area',
     line: {
-      color: '#9E9E9E',
-      fill: '#eee',
-      opacity: '0.2',
-      hoverColor: '#CC8C4C',
+      color: '#ccc',
+      fill: '#2d2d2d',
+      opacity: .8,
       width: 1
-    },
+    }
   },
   {
     data: data,
@@ -278,7 +284,7 @@ Chart.plainChart({
       width: 3
     },
     point: {
-      radius: 4,
+      radius: 5,
       innerColor: '#fff',
       outerColor: '#3d3d3d',
       strokeWidth: 1
@@ -287,8 +293,8 @@ Chart.plainChart({
 ]);
 
 
-function hoverHandler(e, data) {
-  console.log(data);
+function hoverHandler(e, point) {
+  console.log(new Date(point.date));
 }
 
 

@@ -115,15 +115,14 @@ window.Chart = {
     offsetY = 5,
     scale = settings.scale || 10;
 
-    settings.width += offsetX * 2;
+    settings.width += offsetX;
     settings.height += offsetY * 2;
 
     const paper = Snap(settings.selector).attr({
       height: settings.height,
-      width: settings.width,
-      viewBox: `-${settings.width / 22} -${settings.height-5} ${settings.width} ${settings.height}`,
+      width: settings.width + 50,
+      viewBox: `0 -${settings.height-5} ${settings.width} ${settings.height}`,
     });
-
 
     if(settings.grid.rows || settings.grid.columns) {
       buildGrid(paper, offsetX, offsetY, scale, settings.width, settings.height, colWidth, settings.grid);
@@ -131,7 +130,7 @@ window.Chart = {
 
     for(let chartData of charts) {
 
-      let columns = getColumns(chartData.data, chartData.period),
+      let columns = getColumns(chartData.data, settings.period),
       type = chartData.type || 'linear';
 
       let defaultColor = '#aaa';
@@ -157,7 +156,7 @@ window.Chart = {
         case 'area': buildAreaPath(paper, columns, offsetX, offsetY, scale, settings.width, colWidth, chartStyle); break;
         case 'linear': buildLinearPath(paper, columns, offsetX, offsetY, scale, colWidth, chartStyle, settings.hover); break;
         case 'bar': buildBarChart(paper, columns, offsetX, offsetY, scale, colWidth, chartStyle, settings.hover); break;
-        default: buildBarChart(paper, columns, offsetX, offsetY, scale, colWidth, chartStyle);
+        default: buildLinearPath(paper, columns, offsetX, offsetY, scale, colWidth, chartStyle, settings.hover);
       }
 
     } // for
@@ -185,7 +184,7 @@ window.Chart = {
       const gridStyle = {
         fill: 'transparent',
         stroke: gridOps.color || '#aaa',
-        strokeWidth: '.5px'
+        strokeWidth: '1px'
       };
 
       gridOps.text = gridOps.text || {};
@@ -203,7 +202,7 @@ window.Chart = {
           if(i % 2 == 0) rows.push(i);
         for(let point of rows) {
           let y = point * _scale + _offsetY;
-          _paper.text(-offsetX, -y+_offsetY, `${point}`)
+          _paper.text(-15, -y+_offsetY, `${point}`)
             .attr(textStyle);
           rowsPathString += ` M0,-${y} L${_width},-${y}`;
         }
@@ -237,7 +236,7 @@ window.Chart = {
 
         let pathString = chartPath.attr('d'),
         coords = `${_offsetX},${-col.count * _scale - _offsetY}`,
-        startPos = `M${_width-_offsetX},-${_offsetY} L${_offsetY},-${_offsetY}`;
+        startPos = `M${_width - _offsetY},-${_offsetY} L${_offsetY},-${_offsetY}`;
 
         chartPath.attr({
           d: pathString ? pathString + `L ${coords}` : startPos + `L ${coords}`,
@@ -314,9 +313,11 @@ window.Chart = {
     function buildBarChart(_paper, _columns, _offsetX, _offsetY, _scale, _colWidth, style, callback) {
       let timeout = 0;
 
+      _offsetX /= 2;
+
       for(let col of _columns) {
         if(col.count) {
-          let bar = _paper.rect(_offsetX, 0 , _colWidth, _colWidth * _scale * 2)
+          let bar = _paper.rect(_offsetX, -_offsetY, _colWidth, 0)
           .attr({
             fill: style.fill,
             stroke: style.color 
@@ -324,7 +325,8 @@ window.Chart = {
 
           setTimeout(() => {
             bar.animate({
-              y: -col.count * _scale - offsetY,
+              y: -col.count * _scale - _offsetY,
+              height: col.count * _scale
             }, 1500, mina.elastic);
           }, timeout);
 
@@ -336,13 +338,14 @@ window.Chart = {
           });
 
         }
-        timeout += 20;
+        timeout += 40;
         _offsetX += _colWidth;
       }
     }
 
-    function getColumns(tasks, period) {
-      period = period || 30,
+    function getColumns(tasks, _period) {
+      _period = _period || 30,
+
 
       daysInMonth = function(year, month) {
         return 32 - new Date(year, month, 32).getDate();
@@ -354,10 +357,11 @@ window.Chart = {
       curMonth = curDate.getMonth(),
       curYear = curDate.getFullYear();
 
+      --curDay;
       /*************************************************
       * CREATE LIST OF CHART COLUMNS
       *************************************************/
-      for(let i = 0; i < period; i++) {
+      for(let i = 0; i < _period; i++) {
         if(curDay == 0)
           curDay = daysInMonth(curYear, --curMonth);
 
@@ -367,7 +371,6 @@ window.Chart = {
           tasks: [],
         });
       }
-
 
       /*************************************************
       * CREATE CHART POINTS
