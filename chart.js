@@ -121,7 +121,7 @@ window.Chart = {
     const paper = Snap(settings.selector).attr({
       height: settings.height,
       width: settings.width,
-      viewBox: `-20 -${settings.height-5} ${settings.width} ${settings.height}`,
+      viewBox: `-${settings.width / 22} -${settings.height-5} ${settings.width} ${settings.height}`,
     });
 
 
@@ -155,8 +155,8 @@ window.Chart = {
 
       switch(type) {
         case 'area': buildAreaPath(paper, columns, offsetX, offsetY, scale, settings.width, colWidth, chartStyle); break;
-        case 'linear': buildLinearPath(paper, columns, offsetX, offsetY, scale, colWidth, chartStyle); break;
-        case 'bar': buildBarChart(paper, columns, offsetX, offsetY, scale, colWidth, chartStyle); break;
+        case 'linear': buildLinearPath(paper, columns, offsetX, offsetY, scale, colWidth, chartStyle, settings.hover); break;
+        case 'bar': buildBarChart(paper, columns, offsetX, offsetY, scale, colWidth, chartStyle, settings.hover); break;
         default: buildBarChart(paper, columns, offsetX, offsetY, scale, colWidth, chartStyle);
       }
 
@@ -188,12 +188,14 @@ window.Chart = {
         strokeWidth: '.5px'
       };
 
+      gridOps.text = gridOps.text || {};
+
       let textStyle = {
-        fontFamily: 'PT Sans',
-        fontWeight: 'bold',
-        fontSize: '.8em',
+        fontFamily: gridOps.text.fontFamily || 'PT Sans',
+        fontWeight: gridOps.text.fontWeight || 'bold',
+        fontSize: gridOps.text.fontSize || '.8em',
         textAnchor: 'middle',
-        fill: '#aaa'
+        fill: gridOps.text.color || '#aaa'
       };
 
       if(gridOps.rows) {
@@ -223,11 +225,11 @@ window.Chart = {
 
       let chartPath = _paper.path().attr({
         stroke: style.color,
-        fill: '#fff',
-        fillOpacity: style.opacity,
+        fill: style.fill,
+        fillOpacity: 0,
         strokeWidth: style.width,
-        strokeDasharray: 5000,
-        strokeDashoffset: 5000,
+        strokeDasharray: 3000,
+        strokeDashoffset: 3000,
         strokeLinejoin: 'round',
       });
 
@@ -243,17 +245,17 @@ window.Chart = {
         _offsetX += _colWidth;
       }
 
-      chartPath.attr({ d: chartPath.attr('d') + 'Z' })
+      chartPath.attr({ d: chartPath.attr('d') + 'Z' });
       chartPath.animate({
         strokeDashoffset: 0,
-      }, 3000);
+      }, 2000);
 
       setTimeout(function() {
         chartPath.animate({fill: style.fill, fillOpacity: style.opacity}, 300);
       }, 1500)
     }
 
-    function buildLinearPath(_paper, _columns, _offsetX, _offsetY, _scale, _colWidth, style) {
+    function buildLinearPath(_paper, _columns, _offsetX, _offsetY, _scale, _colWidth, style, callback) {
 
       let chartPath = paper.path().attr({
         stroke: style.color,
@@ -287,8 +289,9 @@ window.Chart = {
         timeout += 30;
 
         let timer;
-        point.hover(function() {
+        point.hover(function(e) {
           this.stop().animate({r: style.point.r * 2}, 1000, mina.elastic);
+          callback(e, col);
         }, function() {
           clearTimeout(timer);
           this.stop().animate({r: style.point.r}, 1000, mina.elastic);
@@ -308,7 +311,7 @@ window.Chart = {
       }, 3000); 
     }
 
-    function buildBarChart(_paper, _columns, _offsetX, _offsetY, _scale, _colWidth, style) {
+    function buildBarChart(_paper, _columns, _offsetX, _offsetY, _scale, _colWidth, style, callback) {
       let timeout = 0;
 
       for(let col of _columns) {
@@ -325,8 +328,9 @@ window.Chart = {
             }, 1500, mina.elastic);
           }, timeout);
 
-          bar.hover(function() {
+          bar.hover(function(e) {
             this.stop().animate({fill: style.hover}, 200, mina.easeinout);
+            callback(e, col);
           }, function() {
             this.stop().animate({fill: style.fill}, 200, mina.easeinout);
           });

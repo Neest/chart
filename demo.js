@@ -238,6 +238,7 @@ let data2 = [
 /*********************************
 * TEST CALL
 *********************************/
+
 Chart.plainChart({
   selector: '#paper',
   height: 150,
@@ -245,10 +246,17 @@ Chart.plainChart({
   period: 30,
   scale: 10,
   axis: false,
+  hover: hoverHandler,
   grid: {
     rows: true,
     columns: true,
     color: '#aaa',
+    text: {
+      color: '#fff',
+      fontFamily: 'PT Sans',
+      fontWeight: 'bold',
+      fontSize: '.8em'
+    }
   }
 }, [
   {
@@ -257,7 +265,7 @@ Chart.plainChart({
     line: {
       color: '#9E9E9E',
       fill: '#eee',
-      opacity: '0.3',
+      opacity: '0.2',
       hoverColor: '#CC8C4C',
       width: 1
     },
@@ -267,8 +275,6 @@ Chart.plainChart({
     type: 'linear',
     line: {
       color: '#fff',
-      opacity: '0.5',
-      hoverColor: '#CC8C4C',
       width: 3
     },
     point: {
@@ -281,7 +287,9 @@ Chart.plainChart({
 ]);
 
 
-
+function hoverHandler(e, data) {
+  console.log(data);
+}
 
 
 
