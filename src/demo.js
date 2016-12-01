@@ -1,7 +1,7 @@
 /*********************************
 * TEST DATA
 *********************************/
-let data = [
+window.data = [
   {date: new Date(2016, 10, 27), task: 'some task1'},
   {date: new Date(2016, 10, 26), task: 'some task1'},
   {date: new Date(2016, 10, 25), task: 'some task1'},
@@ -164,7 +164,7 @@ let data = [
   {date: new Date(2016, 9, 26), task: 'some task'},
 ];
 
-let data2 = [
+window.data2 = [
   {date: new Date(2016, 10, 25), task: 'some task1'},
   {date: new Date(2016, 10, 24), task: 'some task1'},
   {date: new Date(2016, 10, 24), task: 'some task2'},
@@ -242,62 +242,6 @@ let data2 = [
   {date: new Date(2016, 9, 27), task: 'some task'},
   {date: new Date(2016, 9, 26), task: 'some task'},
 ];
-/*********************************
-* TEST CALL
-*********************************/
-
-Chart.plainChart({
-  selector: '#paper',
-  height: 150,
-  width: 550,
-  period: 30,
-  scale: 10,
-  axis: false,
-  hover: hoverHandler,
-  grid: {
-    rows: true,
-    columns: true,
-    color: '#6D6C6C',
-    text: {
-      color: '#fff',
-      fontFamily: 'PT Sans',
-      fontWeight: 'bold',
-      fontSize: '.8em'
-    }
-  }
-}, [
-  {
-    data: data2,
-    type: 'area',
-    line: {
-      color: '#ccc',
-      fill: '#2d2d2d',
-      opacity: .8,
-      width: 1
-    }
-  },
-  {
-    data: data,
-    type: 'linear',
-    line: {
-      color: '#fff',
-      width: 3
-    },
-    point: {
-      radius: 5,
-      innerColor: '#fff',
-      outerColor: '#3d3d3d',
-      strokeWidth: 1
-    },
-  },
-]);
-
-
-function hoverHandler(e, point) {
-  console.log(new Date(point.date));
-}
-
-
 
 
 

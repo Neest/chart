@@ -1,21 +1,80 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Document</title>
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans|PT+Sans|Poiret+One" rel="stylesheet">
+  <title></title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <style>
+    body {
+      background :#3d3d3d;
+    }
+  </style>
   
-<div class="container">
-  <svg id="paper" version="1.1" xmlns="http://www.w3.org/2000/svg"></svg>
-</div>
+  <div class="container">
+    <svg id="pie"></svg>
+  </div>
 
-  <script src="svg/dist/snap.svg.js"></script>
-  <script src="chart.js"></script>
-  <script src="demo.js"></script>
+  <script src="vendor/Snap.svg/dist/snap.svg-min.js"></script>
+  <script src="src/util.js"></script>
+  <script src="src/demo.js"></script>
+  <script src="src/radial.js"></script>
+  <script src="src/chart_model.js"></script>
+  <script src="src/linear.js"></script>
+  <script src="src/bar.js"></script>
+  <script src="src/area.js"></script>
+  <script src="dist/chart.js"></script>
   <script>
+
+    Chart.linear({
+     selector: '#pie',
+     height: 160,
+     width: 500,
+     period: 30,
+     scale: 10,
+     axis: false,
+     hover: function() {},
+     grid: {
+       rows: true,
+       columns: true,
+       color: '#6D6C6C',
+       text: {
+         color: '#fff',
+         fontFamily: 'PT Sans',
+         fontWeight: 'bold',
+         fontSize: '.8em'
+       }
+     }
+   }, [
+      {
+        data: data,
+        line: {
+          color: '#fff',
+          width: 3
+        },
+        point: {
+          radius: 5,
+          innerColor: '#fff',
+          outerColor: '#3d3d3d',
+          strokeWidth: 1
+        },
+      },
+     ] 
+    );
+
+    // Chart.radial({
+    //   selector: '#pie',
+    //   persent: 70, 
+    //   r: 100,
+    //   width: 15,
+    //   duration: 700,
+    //   strokeFilled: '#00c8ff',
+    //   strokeEmpty: 'transparent',
+    //   fontFamily: 'Ubuntu Light',
+    //   fontWeight: '0'
+    // });
+
   </script>
 </body>
 </html>
