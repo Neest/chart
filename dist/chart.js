@@ -2,6 +2,9 @@ window.Chart = {
   radial: function(settings) {
     new Radial(settings);
   },
+  pie: function(settings) {
+    new Pie(settings);
+  },
   bar: function(settings, charts) {
     new Bar(settings, charts);
   },
