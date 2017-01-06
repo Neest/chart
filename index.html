@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title></title>
-  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <style>
@@ -63,19 +62,70 @@
    //    },
    //   ] 
    //  );
+
+   // test data to pass into the pie chart constructor
+   let todos = [
+    { priority: 3},
+    { priority: 3},
+    { priority: 2},
+    { priority: 2},
+    { priority: 1},
+    { priority: 2},
+    { priority: 3},
+    { priority: 2},
+    { priority: 2},
+    { priority: 1},
+    { priority: 2},
+    { priority: 1},
+    { priority: 2},
+    { priority: 3},
+    { priority: 2},
+    { priority: 3},
+    { priority: 1},
+    { priority: 1},
+    { priority: 2},
+    { priority: 3},
+    { priority: 3},
+    { priority: 1},
+   ];
+
+    /*
+    * You can use both static, and dynamic ways to describe sectors
+    * Dynamic way requires an array of data and a key for parsing
+    * Static way requires a set of objects that contain persent value
+    */
     Chart.pie({
       selector: '#pie',
       r: 100,
       r2: 40,
       animationDuration: 500,
+      hintColor: '#fff',
       hover: function() {},
-      sectors: [
-        {persent: 30, fill: '#EE543A' },
-        {persent: 20, fill: '#7BB0A6' },
-        {persent: 25, fill: '#97CE68' },
-        {persent: 25, fill: '#ffffff' },
-      ],
+
+      // An examplte of static way of description sectors
+
+      // sectors: [
+      //   {persent: 30, fill: '#EE543A' },
+      //   {persent: 20, fill: '#7BB0A6' },
+      //   {persent: 25, fill: '#97CE68' },
+      //   {persent: 25, fill: '#ffffff' },
+      // ],
+
+      sectors: {
+        data: todos,
+        key: 'priority',
+        colors: { 
+          /*
+          * It the case 1, 2 and 3 are all possible priority values
+          * and each of it needs a unique color to be filled with 
+          */
+          1: '#EE543A',
+          2: '#7BB0A6',
+          3: '#97CE68'
+        },
+      }
     });
+
     // Chart.radial({
     //   selector: '#pie',
     //   persent: 70, 
