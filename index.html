@@ -8,6 +8,7 @@
   <style>
     body {
       background :#3d3d3d;
+      padding: 100px 50px;
     }
   </style>
   
@@ -25,70 +26,8 @@
   <script src="src/bar.js"></script>
   <script src="src/area.js"></script>
   <script src="dist/chart.js"></script>
+
   <script>
-
-   //  Chart.linear({
-   //   selector: '#pie',
-   //   height: 160,
-   //   width: 500,
-   //   period: 30,
-   //   scale: 10,
-   //   axis: false,
-   //   hover: function() {},
-   //   grid: {
-   //     rows: true,
-   //     columns: true,
-   //     color: '#6D6C6C',
-   //     text: {
-   //       color: '#fff',
-   //       fontFamily: 'PT Sans',
-   //       fontWeight: 'bold',
-   //       fontSize: '.8em'
-   //     }
-   //   }
-   // }, [
-   //    {
-   //      data: data,
-   //      line: {
-   //        color: '#fff',
-   //        width: 3
-   //      },
-   //      point: {
-   //        radius: 5,
-   //        innerColor: '#fff',
-   //        outerColor: '#3d3d3d',
-   //        strokeWidth: 1
-   //      },
-   //    },
-   //   ] 
-   //  );
-
-   // test data to pass into the pie chart constructor
-   let todos = [
-    { priority: 3},
-    { priority: 3},
-    { priority: 2},
-    { priority: 2},
-    { priority: 1},
-    { priority: 2},
-    { priority: 3},
-    { priority: 2},
-    { priority: 2},
-    { priority: 1},
-    { priority: 2},
-    { priority: 1},
-    { priority: 2},
-    { priority: 3},
-    { priority: 2},
-    { priority: 3},
-    { priority: 1},
-    { priority: 1},
-    { priority: 2},
-    { priority: 3},
-    { priority: 3},
-    { priority: 1},
-   ];
-
     /*
     * You can use both static, and dynamic ways to describe sectors
     * Dynamic way requires an array of data and a key for parsing
@@ -110,7 +49,6 @@
       //   {persent: 25, fill: '#97CE68' },
       //   {persent: 25, fill: '#ffffff' },
       // ],
-
       sectors: {
         data: todos,
         key: 'priority',
@@ -125,18 +63,6 @@
         },
       }
     });
-
-    // Chart.radial({
-    //   selector: '#pie',
-    //   persent: 70, 
-    //   r: 100,
-    //   width: 15,
-    //   duration: 700,
-    //   strokeFilled: '#00c8ff',
-    //   strokeEmpty: 'transparent',
-    //   fontFamily: 'Ubuntu Light',
-    //   fontWeight: '0'
-    // });
 
   </script>
 </body>
